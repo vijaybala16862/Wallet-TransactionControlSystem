@@ -65,12 +65,6 @@ Ensure database credentials are properly configured before running the applicati
 - Concurrency handling
 - Unit testing and SonarQube integration
 
-## Contribution Guidelines
-- Fork the repository
-- Create a feature branch
-- Commit changes with meaningful messages
-- Raise a pull request for review
-
 ## Author
 Govindavasan R
 GitHub: https://github.com/vijaybala16862
