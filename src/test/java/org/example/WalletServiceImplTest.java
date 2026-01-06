@@ -1,9 +1,10 @@
-package com.example.wallet.service;
+package org.example;
 
 import com.example.wallet.dao.WalletDao;
 import com.example.wallet.exception.BusinessException;
 import com.example.wallet.model.Wallet;
 
+import com.example.wallet.service.WalletServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -14,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)   // 🔥 THIS WILL NOW WORK
+@ExtendWith(MockitoExtension.class)
 class WalletServiceImplTest {
 
     @Mock

@@ -8,7 +8,6 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletDao walletDao;
 
-    // ✅ Mockito will inject mock here
     public WalletServiceImpl(WalletDao walletDao) {
         this.walletDao = walletDao;
     }
@@ -41,16 +40,21 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void credit(String walletId, double amount) {
-        if (amount <= 0) throw new BusinessException("Invalid credit amount");
+        if (amount <= 0) {
+            throw new BusinessException("Invalid credit amount");
+        }
 
         Wallet wallet = get(walletId);
         wallet.setBalance(wallet.getBalance() + amount);
         walletDao.update(wallet);
     }
 
+
     @Override
     public void debit(String walletId, double amount) {
-        if (amount <= 0) throw new BusinessException("Invalid debit amount");
+        if (amount <= 0) {
+            throw new BusinessException("Invalid debit amount");
+        }
 
         Wallet wallet = get(walletId);
         if (wallet.getBalance() < amount) {
@@ -60,6 +64,7 @@ public class WalletServiceImpl implements WalletService {
         wallet.setBalance(wallet.getBalance() - amount);
         walletDao.update(wallet);
     }
+
 
     @Override
     public void delete(String walletId) {
