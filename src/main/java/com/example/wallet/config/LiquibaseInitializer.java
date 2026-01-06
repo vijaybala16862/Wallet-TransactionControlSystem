@@ -26,13 +26,15 @@ public class LiquibaseInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+
         try {
             Properties props = new Properties();
 
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try (InputStream is = cl.getResourceAsStream("application.properties")) {
                 if (is == null) {
-                    throw new IllegalStateException("application.properties not found");
+                    LOG.error("application.properties not found. Skipping Liquibase.");
+                    return;
                 }
                 props.load(is);
             }
@@ -57,11 +59,11 @@ public class LiquibaseInitializer implements ServletContextListener {
                 );
 
                 liquibase.update();
+                LOG.info("Liquibase migration completed successfully");
             }
 
         } catch (Exception e) {
-            LOG.error("Liquibase initialization failed", e);
-            throw new IllegalStateException("Application startup failed", e);
+            LOG.error("Liquibase initialization failed. Application will continue without migration.", e);
         }
     }
 }
