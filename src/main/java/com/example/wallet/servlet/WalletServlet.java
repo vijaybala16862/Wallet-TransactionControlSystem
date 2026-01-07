@@ -11,62 +11,74 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.Serial;
 
-@WebServlet("/wallet/*")
+@WebServlet("/wallet/")
 public class WalletServlet extends HttpServlet {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    private transient WalletService service;
-
-    public WalletServlet() {
-        this.service = null;
-    }
+    private WalletService service;
 
     @Override
     public void init() {
         this.service = new WalletServiceImpl(new WalletDaoImpl());
     }
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    private String extractWalletId(HttpServletRequest req,
+                                   HttpServletResponse resp) throws IOException {
 
-        String walletId = req.getPathInfo().substring(1);
-        Wallet wallet = service.get(walletId);
+        String pathInfo = req.getPathInfo();
 
-        resp.getWriter().write(wallet.getWalletId() + " : " + wallet.getBalance());
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "WalletId required");
+            return null;
+        }
+        return pathInfo.substring(1);
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    public void doPost(HttpServletRequest req,
+                       HttpServletResponse resp) throws IOException {
 
-        Wallet wallet = service.create(req.getParameter("userId"));
+        String userId = req.getParameter("userId");
+        Wallet wallet = service.create(userId);
+
         resp.setStatus(HttpServletResponse.SC_CREATED);
         resp.getWriter().write(wallet.getWalletId());
     }
 
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    public void doGet(HttpServletRequest req,
+                      HttpServletResponse resp) throws IOException {
 
-        String walletId = req.getPathInfo().substring(1);
+        String walletId = extractWalletId(req, resp);
+        if (walletId == null) return;
+
+        Wallet wallet = service.get(walletId);
+        resp.getWriter().write(
+                wallet.getWalletId() + " : " + wallet.getBalance()
+        );
+    }
+
+    @Override
+    public void doPut(HttpServletRequest req,
+                      HttpServletResponse resp) throws IOException {
+
+        String walletId = extractWalletId(req, resp);
+        if (walletId == null) return;
+
         double amount = Double.parseDouble(req.getParameter("amount"));
-
         service.credit(walletId, amount);
+
         resp.getWriter().write("Credited");
     }
 
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    public void doDelete(HttpServletRequest req,
+                         HttpServletResponse resp) throws IOException {
 
-        String walletId = req.getPathInfo().substring(1);
+        String walletId = extractWalletId(req, resp);
+        if (walletId == null) return;
+
         service.delete(walletId);
-
         resp.getWriter().write("Deleted");
     }
 }
