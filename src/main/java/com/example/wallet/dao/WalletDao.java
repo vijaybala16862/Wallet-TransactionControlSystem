@@ -10,4 +10,9 @@ public interface WalletDao {
     void update(Wallet wallet);
 
     void delete(String walletId);
+
+    void saveTransaction(String walletId,
+                         String txnType,
+                         double amount,
+                         double balanceAfter);
 }

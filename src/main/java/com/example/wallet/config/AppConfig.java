@@ -37,8 +37,7 @@ public class AppConfig implements ServletContextListener {
                                  .getResourceAsStream("application.properties")) {
 
                 if (is == null) {
-                    LOG.error("application.properties not found");
-                    return;
+                    throw new RuntimeException("application.properties not found");
                 }
                 props.load(is);
             }
@@ -48,23 +47,28 @@ public class AppConfig implements ServletContextListener {
             config.setUsername(props.getProperty("db.username"));
             config.setPassword(props.getProperty("db.password"));
             config.setDriverClassName(props.getProperty("db.driver"));
-            config.setMaximumPoolSize(Integer.parseInt(props.getProperty("db.pool.size")));
-            config.setConnectionTimeout(Long.parseLong(props.getProperty("db.pool.timeout")));
+            config.setMaximumPoolSize(
+                    Integer.parseInt(props.getProperty("db.pool.size", "10"))
+            );
+            config.setConnectionTimeout(
+                    Long.parseLong(props.getProperty("db.pool.timeout", "30000"))
+            );
 
             dataSource = new HikariDataSource(config);
             DBUtil.setDataSource(dataSource);
 
             LOG.info("Datasource initialized successfully");
 
-            runLiquibaseSafely();
+            runLiquibase();
 
         } catch (Exception e) {
             LOG.error("Application startup failed", e);
+            throw new RuntimeException(e);
         }
     }
 
-    private void runLiquibaseSafely() {
-        try (Connection con = DBUtil.getConnection()) {
+    private void runLiquibase() {
+        try (Connection con = dataSource.getConnection()) {
 
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(
@@ -81,6 +85,7 @@ public class AppConfig implements ServletContextListener {
 
         } catch (Exception e) {
             LOG.error("Liquibase migration failed", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -88,6 +93,7 @@ public class AppConfig implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         if (dataSource != null) {
             dataSource.close();
+            LOG.info("Datasource closed");
         }
     }
 }

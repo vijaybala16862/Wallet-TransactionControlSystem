@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="002-create-wallet-transactions" author="bala">
+
+        <createTable tableName="wallet_transactions">
+
+            <column name="txn_id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="wallet_id" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="txn_type" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="amount" type="decimal(15,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="balance_after" type="decimal(15,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="txn_time" type="timestamp"
+                    defaultValueComputed="CURRENT_TIMESTAMP"/>
+
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="wallet_transactions"
+                baseColumnNames="wallet_id"
+                referencedTableName="wallets"
+                referencedColumnNames="wallet_id"
+                constraintName="fk_wallet_transactions_wallet"/>
+
+    </changeSet>
+
+</databaseChangeLog>

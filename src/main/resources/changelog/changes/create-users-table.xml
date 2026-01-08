@@ -6,30 +6,23 @@
           http://www.liquibase.org/xml/ns/dbchangelog
           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
 
-    <changeSet id="001-create-wallets" author="bala">
+    <changeSet id="003-create-users-table" author="bala">
 
-        <createTable tableName="wallets">
+        <createTable tableName="users">
 
-            <column name="wallet_id" type="varchar(50)">
+            <column name="user_id" type="varchar(50)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="user_id" type="varchar(50)">
-                <constraints nullable="false"/>
+            <column name="username" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="balance" type="decimal(15,2)" defaultValueNumeric="0.00">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="status" type="varchar(20)">
+            <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
             <column name="created_at" type="timestamp"
-                    defaultValueComputed="CURRENT_TIMESTAMP"/>
-
-            <column name="updated_at" type="timestamp"
                     defaultValueComputed="CURRENT_TIMESTAMP"/>
 
         </createTable>

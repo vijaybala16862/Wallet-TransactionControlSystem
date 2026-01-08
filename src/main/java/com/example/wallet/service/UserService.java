@@ -1,31 +1,46 @@
 package com.example.wallet.service;
 
 import com.example.wallet.dao.UserDao;
+import com.example.wallet.exception.BusinessException;
 import com.example.wallet.model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
 
-    private final UserDao userDao = new UserDao();
+    private final UserDao userDao;
 
-    public User getByUsername(String username) {
-
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username required");
-        }
-
-        return userDao.findByUsername(username);
+    public UserService(UserDao userDao) {
+        this.userDao = userDao;
     }
 
-    public void register(User user) {
+    public void register(String username, String plainPassword, String role) {
 
-        if (user.getUsername() == null || user.getPassword() == null) {
-            throw new IllegalArgumentException("Invalid user data");
+        if (username == null || plainPassword == null) {
+            throw new BusinessException("Username and password required");
         }
 
-        if (user.getRole() == null) {
-            user.setRole("USER");
-        }
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(hashedPassword);
+        user.setRole(role == null ? "USER" : role);
 
         userDao.save(user);
+    }
+
+    public User login(String username, String plainPassword) {
+
+        User user = userDao.findByUsername(username);
+        if (user == null) {
+            throw new BusinessException("Invalid username or password");
+        }
+
+        boolean matched = BCrypt.checkpw(plainPassword, user.getPassword());
+        if (!matched) {
+            throw new BusinessException("Invalid username or password");
+        }
+
+        return user;
     }
 }

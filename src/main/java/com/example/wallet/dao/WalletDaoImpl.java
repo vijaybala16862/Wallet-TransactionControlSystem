@@ -17,7 +17,7 @@ public class WalletDaoImpl implements WalletDao {
 
     @Override
     public void save(Wallet wallet) {
-        String sql = "INSERT INTO wallet(wallet_id,user_id,balance,status) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO wallets (wallet_id, user_id, balance, status) VALUES (?, ?, ?, ?)";
 
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -36,7 +36,7 @@ public class WalletDaoImpl implements WalletDao {
 
     @Override
     public Wallet findById(String walletId) {
-        String sql = "SELECT wallet_id,user_id,balance,status FROM wallet WHERE wallet_id=?";
+        String sql = "SELECT wallet_id, user_id, balance, status FROM wallets WHERE wallet_id = ?";
 
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -62,13 +62,14 @@ public class WalletDaoImpl implements WalletDao {
 
     @Override
     public void update(Wallet wallet) {
-        String sql = "UPDATE wallet SET balance=? WHERE wallet_id=?";
+        String sql = "UPDATE wallets SET balance = ?, status = ? WHERE wallet_id = ?";
 
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setDouble(1, wallet.getBalance());
-            ps.setString(2, wallet.getWalletId());
+            ps.setString(2, wallet.getStatus());
+            ps.setString(3, wallet.getWalletId());
 
             ps.executeUpdate();
 
@@ -79,7 +80,7 @@ public class WalletDaoImpl implements WalletDao {
 
     @Override
     public void delete(String walletId) {
-        String sql = "DELETE FROM wallet WHERE wallet_id=?";
+        String sql = "DELETE FROM wallets WHERE wallet_id = ?";
 
         try (Connection con = DBUtil.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -91,4 +92,27 @@ public class WalletDaoImpl implements WalletDao {
             throw new DataAccessException("Error deleting wallet", e);
         }
     }
+
+    @Override
+    public void saveTransaction(String walletId, String txnType, double amount, double balanceAfter) {
+
+        String sql = """
+        INSERT INTO wallet_transactions(wallet_id, txn_type, amount, balance_after)VALUES (?, ?, ?, ?)
+        """;
+
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, walletId);
+            ps.setString(2, txnType);
+            ps.setDouble(3, amount);
+            ps.setDouble(4, balanceAfter);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            throw new DataAccessException("Error saving wallet transaction", e);
+        }
+    }
+
 }

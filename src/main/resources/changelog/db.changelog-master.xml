@@ -3,10 +3,11 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
-        http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
 
     <include file="changelog/changes/create-wallet-table.xml"/>
     <include file="changelog/changes/create-wallet-transaction-table.xml"/>
+    <include file="changelog/changes/create-users-table.xml"/>
 
 </databaseChangeLog>

@@ -25,13 +25,13 @@ public class WalletServlet extends HttpServlet {
     private String extractWalletId(HttpServletRequest req,
                                    HttpServletResponse resp) throws IOException {
 
-        String pathInfo = req.getPathInfo();
+        String pathInfo = req.getParameter("walletId");
 
         if (pathInfo == null || pathInfo.length() <= 1) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "WalletId required");
             return null;
         }
-        return pathInfo.substring(1);
+        return pathInfo;
     }
 
     @Override
@@ -65,11 +65,31 @@ public class WalletServlet extends HttpServlet {
         String walletId = extractWalletId(req, resp);
         if (walletId == null) return;
 
-        double amount = Double.parseDouble(req.getParameter("amount"));
-        service.credit(walletId, amount);
+        String action = req.getParameter("action");
+        String amountStr = req.getParameter("amount");
 
-        resp.getWriter().write("Credited");
+        if (action == null || amountStr == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "action and amount are required");
+            return;
+        }
+
+        double amount = Double.parseDouble(amountStr);
+
+        if ("credit".equalsIgnoreCase(action)) {
+            service.credit(walletId, amount);
+            resp.getWriter().write("Credited");
+
+        } else if ("debit".equalsIgnoreCase(action)) {
+            service.debit(walletId, amount);
+            resp.getWriter().write("Debited");
+
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid action. Use credit or debit");
+        }
     }
+
 
     @Override
     public void doDelete(HttpServletRequest req,
