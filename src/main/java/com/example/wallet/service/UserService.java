@@ -13,7 +13,7 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void register(String username, String plainPassword, String role) {
+    public void register(String username, String plainPassword) {
 
         if (username == null || plainPassword == null) {
             throw new BusinessException("Username and password required");
@@ -24,7 +24,6 @@ public class UserService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(hashedPassword);
-        user.setRole(role == null ? "USER" : role);
 
         userDao.save(user);
     }

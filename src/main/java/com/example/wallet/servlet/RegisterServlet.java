@@ -26,9 +26,8 @@ public class RegisterServlet extends HttpServlet {
 
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-        String role = req.getParameter("role"); // optional
 
-        userService.register(username, password, role);
+        userService.register(username, password);
 
         resp.getWriter().write("User registered successfully");
     }

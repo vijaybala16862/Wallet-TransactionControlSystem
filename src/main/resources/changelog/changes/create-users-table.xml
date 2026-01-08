@@ -10,7 +10,7 @@
 
         <createTable tableName="users">
 
-            <column name="user_id" type="varchar(50)">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 

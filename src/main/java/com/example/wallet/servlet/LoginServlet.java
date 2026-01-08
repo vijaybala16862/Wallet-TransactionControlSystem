@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -18,7 +19,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() {
-        this.userService = new UserService(new UserDaoImpl());
+        userService = new UserService(new UserDaoImpl());
     }
 
     @Override
@@ -28,16 +29,12 @@ public class LoginServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        try {
-            User user = userService.login(username, password);
+        User user = userService.login(username, password);
 
-            resp.getWriter().write(
-                    "Login success | UserId=" + user.getId() +
-                            " | Role=" + user.getRole()
-            );
+        HttpSession session = req.getSession(true);
+        session.setAttribute("userId", user.getId());
+        session.setMaxInactiveInterval(30 * 60);
 
-        } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-        }
+        resp.getWriter().write("Login successful");
     }
 }

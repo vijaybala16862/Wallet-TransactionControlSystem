@@ -3,12 +3,12 @@ package com.example.wallet.servlet;
 import com.example.wallet.dao.WalletDaoImpl;
 import com.example.wallet.model.Wallet;
 import com.example.wallet.service.WalletService;
-import com.example.wallet.service.WalletServiceImpl;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -19,26 +19,46 @@ public class WalletServlet extends HttpServlet {
 
     @Override
     public void init() {
-        this.service = new WalletServiceImpl(new WalletDaoImpl());
+        this.service = new WalletService(new WalletDaoImpl());
     }
 
-    private String extractWalletId(HttpServletRequest req,
-                                   HttpServletResponse resp) throws IOException {
+    private boolean isLoggedIn(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        String pathInfo = req.getParameter("walletId");
+        HttpSession session = req.getSession(false);
 
-        if (pathInfo == null || pathInfo.length() <= 1) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "WalletId required");
+        if (session == null || session.getAttribute("userId") == null) {
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Please login first");
+            return false;
+        }
+        return true;
+    }
+
+    private String extractWalletId(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String walletId = req.getParameter("walletId");
+
+        if (walletId == null || walletId.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "walletId required");
             return null;
         }
-        return pathInfo;
+        return walletId;
     }
 
     @Override
-    public void doPost(HttpServletRequest req,
-                       HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        if (!isLoggedIn(req, resp)) return;
 
         String userId = req.getParameter("userId");
+
+        if (userId == null || userId.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "userId required");
+            return;
+        }
+
         Wallet wallet = service.create(userId);
 
         resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -46,21 +66,24 @@ public class WalletServlet extends HttpServlet {
     }
 
     @Override
-    public void doGet(HttpServletRequest req,
-                      HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        if (!isLoggedIn(req, resp)) return;
 
         String walletId = extractWalletId(req, resp);
         if (walletId == null) return;
 
         Wallet wallet = service.get(walletId);
+
         resp.getWriter().write(
                 wallet.getWalletId() + " : " + wallet.getBalance()
         );
     }
 
     @Override
-    public void doPut(HttpServletRequest req,
-                      HttpServletResponse resp) throws IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        if (!isLoggedIn(req, resp)) return;
 
         String walletId = extractWalletId(req, resp);
         if (walletId == null) return;
@@ -70,11 +93,18 @@ public class WalletServlet extends HttpServlet {
 
         if (action == null || amountStr == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "action and amount are required");
+                    "action and amount required");
             return;
         }
 
-        double amount = Double.parseDouble(amountStr);
+        double amount;
+        try {
+            amount = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid amount");
+            return;
+        }
 
         if ("credit".equalsIgnoreCase(action)) {
             service.credit(walletId, amount);
@@ -90,10 +120,10 @@ public class WalletServlet extends HttpServlet {
         }
     }
 
-
     @Override
-    public void doDelete(HttpServletRequest req,
-                         HttpServletResponse resp) throws IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        if (!isLoggedIn(req, resp)) return;
 
         String walletId = extractWalletId(req, resp);
         if (walletId == null) return;
