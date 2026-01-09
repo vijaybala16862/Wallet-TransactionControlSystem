@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WalletServletTest {
+class LoginServletTest {
 
     @Test
-    void wallet_access_without_login() {
+    void login_without_parameters() {
         assertTrue(true);
     }
 }

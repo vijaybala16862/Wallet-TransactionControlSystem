@@ -3,28 +3,33 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
-          http://www.liquibase.org/xml/ns/dbchangelog
-          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+           http://www.liquibase.org/xml/ns/dbchangelog
+           https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
 
     <changeSet id="003-create-users-table" author="bala">
 
-        <createTable tableName="users">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
 
-            <column name="id" type="int" autoIncrement="true">
+        <createTable tableName="users">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="username" type="varchar(50)">
+            <column name="username" type="VARCHAR(50)">
                 <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="password" type="varchar(255)">
+            <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="created_at" type="timestamp"
+            <column name="created_at"
+                    type="timestamp"
                     defaultValueComputed="CURRENT_TIMESTAMP"/>
-
         </createTable>
 
     </changeSet>

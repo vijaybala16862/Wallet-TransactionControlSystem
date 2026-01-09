@@ -14,6 +14,7 @@ import java.io.IOException;
 
 @WebServlet("/wallet/")
 public class WalletServlet extends HttpServlet {
+    private static final long serialVersionUID=1L;
 
     private WalletService service;
 
