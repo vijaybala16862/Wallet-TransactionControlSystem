@@ -1,7 +1,9 @@
+---
+title: Wallet Transaction control-Class Diagram
+---
 classDiagram
 direction LR
 
-    %% ===== Servlets =====
     class LoginServlet {
         +doPost()
     }
@@ -17,7 +19,6 @@ direction LR
         +doDelete()
     }
 
-    %% ===== Services =====
     class UserService {
         +register(String, String)
         +login(String, String)
@@ -31,7 +32,6 @@ direction LR
         +delete(walletId)
     }
 
-    %% ===== DAO Layer =====
     class UserDao {
         +save(user)
         +findByUsername(username)
@@ -58,7 +58,6 @@ direction LR
         +saveTransaction()
     }
 
-    %% ===== Models =====
     class User {
         +int id
         +String username
@@ -82,7 +81,6 @@ direction LR
         +getStatus()
     }
 
-    %% ===== Relationships (Exact Flow) =====
     LoginServlet --> UserService
     RegisterServlet --> UserService
 
