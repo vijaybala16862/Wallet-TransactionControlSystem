@@ -1,9 +1,7 @@
-# Wallet Transaction Control Flow – Class Diagram
-
-```mermaid
 classDiagram
-    direction LR
+direction LR
 
+    %% ===== Servlets =====
     class LoginServlet {
         +doPost()
     }
@@ -19,9 +17,10 @@ classDiagram
         +doDelete()
     }
 
+    %% ===== Services =====
     class UserService {
-        +register(username, password)
-        +login(username, password)
+        +register(String, String)
+        +login(String, String)
     }
 
     class WalletService {
@@ -32,30 +31,66 @@ classDiagram
         +delete(walletId)
     }
 
-    class UserDao
-    class WalletDao
-    class UserDaoImpl
-    class WalletDaoImpl
+    %% ===== DAO Layer =====
+    class UserDao {
+        +save(user)
+        +findByUsername(username)
+    }
 
+    class UserDaoImpl {
+        +save(user)
+        +findByUsername(username)
+    }
+
+    class WalletDao {
+        +save(wallet)
+        +findById(walletId)
+        +update(wallet)
+        +delete(walletId)
+        +saveTransaction()
+    }
+
+    class WalletDaoImpl {
+        +save(wallet)
+        +findById(walletId)
+        +update(wallet)
+        +delete(walletId)
+        +saveTransaction()
+    }
+
+    %% ===== Models =====
     class User {
-        id
-        username
-        password
+        +int id
+        +String username
+        +String password
+        +getId()
+        +getUsername()
+        +getPassword()
+        +setId()
+        +setUsername()
+        +setPassword()
     }
 
     class Wallet {
-        walletId
-        userId
-        balance
-        status
+        +String walletId
+        +String userId
+        +double balance
+        +String status
+        +getWalletId()
+        +getUserId()
+        +getBalance()
+        +getStatus()
     }
 
+    %% ===== Relationships (Exact Flow) =====
     LoginServlet --> UserService
     RegisterServlet --> UserService
-    WalletServlet --> WalletService
 
     UserService --> UserDao
-    WalletService --> WalletDao
-
     UserDaoImpl ..|> UserDao
+    UserDao --> User
+
+    WalletServlet --> WalletService
+    WalletService --> WalletDao
     WalletDaoImpl ..|> WalletDao
+    WalletDao --> Wallet
