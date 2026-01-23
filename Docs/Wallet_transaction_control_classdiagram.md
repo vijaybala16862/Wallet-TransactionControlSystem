@@ -1,8 +1,6 @@
----
-title: Wallet Transaction control-Class Diagram
----
-classDiagram
-direction LR
+# Wallet Transaction Control System – Class Diagram
+
+```mermaid
 
     class LoginServlet {
         +doPost()
