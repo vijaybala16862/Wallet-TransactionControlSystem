@@ -1,6 +1,8 @@
 # Wallet Transaction Control System – Class Diagram
 
 ```mermaid
+classDiagram
+    direction LR
 
     class LoginServlet {
         +doPost()
@@ -60,12 +62,6 @@
         +int id
         +String username
         +String password
-        +getId()
-        +getUsername()
-        +getPassword()
-        +setId()
-        +setUsername()
-        +setPassword()
     }
 
     class Wallet {
@@ -73,20 +69,17 @@
         +String userId
         +double balance
         +String status
-        +getWalletId()
-        +getUserId()
-        +getBalance()
-        +getStatus()
     }
 
     LoginServlet --> UserService
     RegisterServlet --> UserService
+    WalletServlet --> WalletService
 
     UserService --> UserDao
-    UserDaoImpl ..|> UserDao
-    UserDao --> User
-
-    WalletServlet --> WalletService
     WalletService --> WalletDao
+
+    UserDaoImpl ..|> UserDao
     WalletDaoImpl ..|> WalletDao
+
+    UserDao --> User
     WalletDao --> Wallet
