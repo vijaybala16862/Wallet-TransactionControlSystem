@@ -1,5 +1,4 @@
-```markdown
-# Wallet Transaction Control Flow – ER Diagram
+# Wallet Transaction Control System – ER Diagram
 
 ```mermaid
 erDiagram
